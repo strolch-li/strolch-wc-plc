@@ -1,0 +1,83 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<script>
+    StrolchPlcBehavior = {
+
+        properties: {
+            localesPath: {
+                type: String,
+                value: './locales.json'
+            }
+        },
+
+        arrayFilled: function (array) {
+            return !!(array && array.length && array.length > 0);
+        },
+
+        isTelegram: function (addressType) {
+            return addressType === "Telegram";
+        },
+        isNotification: function (addressType) {
+            return addressType === "Notification";
+        },
+
+        isBoolean: function (type) {
+            return type === 'Boolean';
+        },
+        isNumber: function (type) {
+            switch (type) {
+                case 'Short':
+                case 'Integer':
+                case 'Long':
+                case 'Float':
+                case 'Double':
+                    return true;
+                default:
+                    return false;
+            }
+        },
+        isInteger: function (type) {
+            switch (type) {
+                case 'Short':
+                case 'Integer':
+                case 'Long':
+                    return true;
+                default:
+                    return false;
+            }
+        },
+        isFloat: function (type) {
+            switch (type) {
+                case 'Float':
+                case 'Double':
+                    return true;
+                default:
+                    return false;
+            }
+        },
+        isString: function (type) {
+            switch (type) {
+                case 'String':
+                case 'ByteArray':
+                    return true;
+                default:
+                    return false;
+            }
+        },
+
+        isPlcError: function (plc) {
+            return plc.state === "Failed";
+        },
+        isError: function (device) {
+            return device.state === "Error" || device.stateMsg !== "";
+        },
+        isOn: function (device) {
+            return device.state === "On";
+        },
+
+        onRequestError: function (e) {
+            this.fire("strolch-ajax-request-error", e.detail);
+        }
+
+    }
+</script>

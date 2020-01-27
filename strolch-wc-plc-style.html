@@ -1,0 +1,119 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-styles/color.html">
+
+<link rel="import" href="../strolch-wc-styles/strolch-wc-styles.html">
+
+<dom-module id="strolch-wc-plc-style">
+    <template>
+        <style is="strolch-wc-plc-style" include="strolch-wc-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                margin-bottom: 10px;
+                padding: 10px;
+                width: calc(100% - 20px);
+            }
+
+            paper-icon-button, iron-icon {
+                color: var(--app-secondary-color);
+            }
+
+            paper-toggle-button {
+                height: 35px;
+            }
+
+            h2, h3 {
+                margin-left: 10px;
+                margin-bottom: 10px;
+            }
+
+            h2, h3, h4 {
+                margin: 10px 0 0;
+                padding: 0;
+            }
+
+            .container {
+                display: flex; /* or inline-flex */
+                flex-direction: column;
+                flex-wrap: wrap;
+            }
+
+            .item {
+                order: 0; /* default is 0 */
+                flex-grow: 0; /* default 0 */
+                flex-shrink: 0; /* default 1 */
+                flex-basis: auto; /* default auto */
+            }
+
+            .actions {
+                display: flex; /* or inline-flex */
+                flex-direction: row;
+                justify-content: flex-end;
+            }
+
+            .card-content {
+                padding: 0;
+            }
+
+            .card-actions {
+                display: flex; /* or inline-flex */
+                flex-direction: row;
+                justify-content: flex-end;
+            }
+
+            .card-actions-right {
+                display: flex; /* or inline-flex */
+                flex-grow: 1; /* default 0 */
+                justify-content: flex-end;
+            }
+
+            .g-flex-table-cell {
+                padding: 0;
+                flex-basis: 150px;
+                min-height: 32px;
+            }
+
+            .label {
+                flex-flow: row-reverse;
+                flex-basis: 150px;
+                flex-grow: 0;
+            }
+
+            .error-icon {
+                color: var(--app-dark-warning-bg-color);
+            }
+
+            .no-grow {
+                flex-grow: 0;
+            }
+
+            .value-input {
+                width: 120px;
+            }
+
+            .address-field {
+                display: block;
+                padding-top: 10px;
+            }
+
+            .address {
+                display: block;
+                width: 100%;
+            }
+
+            .hw-address {
+                display: block;
+                width: 100%;
+                font-size: smaller;
+                color: gray;
+            }
+
+            paper-radio-button {
+                padding-left: 12px;
+            }
+
+        </style>
+    </template>
+</dom-module>

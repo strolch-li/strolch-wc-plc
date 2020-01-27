@@ -1,0 +1,260 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-icons/notification-icons.html">
+<link rel="import" href="../iron-icons/maps-icons.html">
+<link rel="import" href="../iron-icons/av-icons.html">
+<link rel="import" href="../iron-icons/communication-icons.html">
+<link rel="import" href="../iron-icons/device-icons.html">
+<link rel="import" href="../iron-icons/hardware-icons.html">
+<link rel="import" href="../iron-icons/editor-icons.html">
+<link rel="import" href="../iron-icons/places-icons.html">
+<link rel="import" href="../iron-icons/social-icons.html">
+
+<link rel="import" href="../paper-material/paper-material.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../paper-radio-group/paper-radio-group.html">
+
+<link rel="import" href="../strolch-wc-localize-behavior/strolch-wc-localize-behavior.html">
+<link rel="import" href="../strolch-wc-ws-observer/strolch-wc-ws-observer.html">
+
+<link rel="import" href="./strolch-wc-plc-style.html">
+<link rel="import" href="./strolch-wc-plc-behavior.html">
+<link rel="import" href="./strolch-wc-plc-logical-device.html">
+
+<dom-module id="strolch-wc-plc-logical-devices">
+    <template>
+
+        <style is="custom-style" include="strolch-wc-plc-style">
+
+        </style>
+
+        <div class="actions">
+            <paper-icon-button class="g-pull-right" icon="refresh" on-tap="_refresh"></paper-icon-button>
+        </div>
+
+        <template is="dom-if" if="[[arrayFilled(virtualAddresses)]]">
+            <h2>[[localize('virtualAddresses')]]</h2>
+            <paper-card elevation="1">
+                <div class="card-content">
+
+                    <div class="g-row">
+                        <div class="g-12">
+
+                            <template is="dom-repeat" items="[[virtualAddresses]]" as="address">
+                                <div class="g-flex-table-row">
+                                    <div class="g-flex-table-cell address-field">
+                                        <div class="address">[[address.resource]] - [[address.action]]</div>
+                                        <div class="hw-address">[[address.address]]</div>
+                                    </div>
+                                    <div class="g-flex-table-cell no-grow value-cell">
+
+                                        <template is="dom-if" if="[[isBoolean(address.type)]]">
+                                            <paper-radio-group selected="{{address.value}}" attr-for-selected="name">
+                                                <paper-radio-button name="true">[[localize('on')]]
+                                                </paper-radio-button>
+                                                <paper-radio-button name="false">[[localize('off')]]
+                                                </paper-radio-button>
+                                            </paper-radio-group>
+                                        </template>
+                                        <template is="dom-if" if="[[isNumber(address.type)]]">
+                                            <paper-input class="value-input"
+                                                         value="{{address.value}}"
+                                                         no-label-float></paper-input>
+                                        </template>
+                                        <template is="dom-if" if="[[isString(address.type)]]">
+                                            <paper-input class="value-input"
+                                                         value="{{address.value}}"
+                                                         no-label-float></paper-input>
+                                        </template>
+
+                                    </div>
+                                    <div class="g-flex-table-cell no-grow">
+                                        <paper-button raised on-tap="sendAddressNotification">[[localize('notify')]]
+                                        </paper-button>
+                                    </div>
+                                </div>
+                            </template>
+
+                        </div>
+                    </div>
+                </div>
+            </paper-card>
+        </template>
+
+        <template is="dom-repeat" items="[[devicesByGroup]]" as="group">
+
+            <h2>[[group.name]]</h2>
+
+            <template is="dom-repeat" items="[[group.data]]" as="device">
+
+                <strolch-wc-plc-logical-device device="[[device]]"
+                                               base-rest-path="[[baseRestPath]]"
+                                               observer-handler="[[observerHandler]]"></strolch-wc-plc-logical-device>
+
+            </template>
+        </template>
+
+        <iron-ajax id="ajaxGetDevices"
+                   url="[[baseRestPath]]/plc/logicalDevices"
+                   content-type="application/json"
+                   handle-as="json"
+                   method="GET"
+                   on-response="onGetDevicesResponse"
+                   on-error="onRequestError"></iron-ajax>
+
+        <iron-ajax id="ajaxGetVirtualAddresses"
+                   url="[[baseRestPath]]/plc/addresses/virtual"
+                   content-type="application/json"
+                   handle-as="json"
+                   method="GET"
+                   on-response="onGetVirtualAddressesResponse"
+                   on-error="onRequestError"></iron-ajax>
+
+        <iron-ajax id="ajaxPutAddress"
+                   url="[[baseRestPath]]/plc/addresses"
+                   content-type="application/json"
+                   handle-as="json"
+                   method="PUT"
+                   on-response="_refresh"
+                   on-error="onAjaxError"></iron-ajax>
+
+        <strolch-wc-ws-observer id="observerHandler" ws-path="[[wsObserverPath]]"></strolch-wc-ws-observer>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'strolch-wc-plc-logical-devices',
+
+            behaviors: [
+                StrolchLocalizeBehavior, StrolchPlcBehavior
+            ],
+
+            properties: {
+                observerHandler: {
+                    type: Object,
+                    value: function () {
+                        return ObserverHandler;
+                    }
+                },
+                registeredForUpdates: {
+                    type: Boolean,
+                    value: false
+                },
+                virtualAddresses: {
+                    type: Array,
+                    value: []
+                },
+                devicesByGroup: {
+                    type: Array,
+                    value: []
+                },
+                wsObserverPath: {
+                    type: String,
+                    value: function () {
+                        return CustomWeb.baseWsPath + "/plc/observer";
+                    }
+                }
+            },
+
+            /* Listeners */
+            onGetDevicesResponse: function (e) {
+                this.devicesByGroup = e.detail.response.data;
+            },
+            onGetVirtualAddressesResponse: function (e) {
+                this.virtualAddresses = e.detail.response.data;
+            },
+
+            sendAddressNotification: function (e) {
+                var a = e.model.address;
+                this.sendAddress("Notification", a.resource, a.action, a.value);
+            },
+            sendAddress: function (type, resource, action, value) {
+                console.log("Sending " + type + " for " + resource + " - " + action + ": " + value);
+                this.$.ajaxPutAddress.body = {
+                    type: type,
+                    resource: resource,
+                    action: action,
+                    value: value
+                };
+                this.$.ajaxPutAddress.generateRequest();
+            },
+
+            _refresh: function () {
+                this.$.ajaxGetDevices.generateRequest();
+                this.$.ajaxGetVirtualAddresses.generateRequest();
+
+                if (!this.registeredForUpdates) {
+                    this.$.observerHandler.register("Resource", "PlcAddress", "strolch-wc-plc-logical-devices", true, this.handleUpdate.bind(this));
+                    this.registeredForUpdates = true;
+                }
+            },
+            onAjaxError: function (e) {
+                this._refresh();
+                this.onRequestError(e);
+            },
+
+            /* Lifecycle */
+            reload: function () {
+                this._refresh();
+            },
+            handleUpdate: function (notifyType, objectType, type, elements) {
+                console.log("Received updates for " + elements.length + " " + objectType + " " + type + " elements.");
+
+                for (var i = 0; i < elements.length; i++) {
+                    this.observerHandler.notifyUpdate(objectType, type, elements[i].id, elements[i]);
+                }
+            }
+        });
+
+        var registrations = {};
+
+        ObserverHandler = {
+            register: function (objectType, type, id, callback) {
+                if (objectType == null || type == null || id == null || callback == null)
+                    throw "One of objectType, type, id or callback is null: " + objectType + ", " + type + ", " + id + ", " + callback;
+                var byObjectType = registrations[objectType];
+                if (byObjectType == null) {
+                    byObjectType = {};
+                    registrations[objectType] = byObjectType;
+                }
+
+                var byType = byObjectType[type];
+                if (byType == null) {
+                    byType = {};
+                    byObjectType[type] = byType;
+                }
+
+                byType[id] = callback;
+            },
+
+            notifyUpdate: function (objectType, type, id, element) {
+                if (objectType == null || type == null || id == null || element == null)
+                    throw "One of objectType, type, id or element is null: " + objectType + ", " + type + ", " + id + ", " + element;
+
+                var byObjectType = registrations[objectType];
+                if (byObjectType == null) {
+                    console.log("No observers for objectType " + objectType);
+                    return;
+                }
+
+                var byType = byObjectType[type];
+                if (byType == null) {
+                    console.log("No observers for byType " + byType);
+                    return;
+                }
+
+                var callback = byType[id];
+                callback(element);
+            }
+        }
+
+
+    </script>
+</dom-module>

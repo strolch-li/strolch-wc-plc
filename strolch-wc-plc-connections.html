@@ -1,0 +1,233 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-icons/notification-icons.html">
+<link rel="import" href="../iron-icons/maps-icons.html">
+<link rel="import" href="../iron-icons/av-icons.html">
+<link rel="import" href="../iron-icons/communication-icons.html">
+<link rel="import" href="../iron-icons/device-icons.html">
+<link rel="import" href="../iron-icons/hardware-icons.html">
+<link rel="import" href="../iron-icons/editor-icons.html">
+<link rel="import" href="../iron-icons/places-icons.html">
+<link rel="import" href="../iron-icons/social-icons.html">
+
+<link rel="import" href="../paper-material/paper-material.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+
+<link rel="import" href="../strolch-wc-localize-behavior/strolch-wc-localize-behavior.html">
+
+<link rel="import" href="./strolch-wc-plc-style.html">
+<link rel="import" href="./strolch-wc-plc-behavior.html">
+
+<dom-module id="strolch-wc-plc-connections">
+    <template>
+
+        <style is="custom-style" include="strolch-wc-plc-style">
+            .label {
+                min-width: 250px;
+                margin-right: 10px;
+            }
+        </style>
+
+        <div class="actions">
+            <paper-icon-button icon="refresh" on-tap="_refresh"></paper-icon-button>
+        </div>
+        <div class="container">
+
+            <paper-card class="item" elevation="1">
+                <div class="header"><h3>[[localize('plc')]]</h3></div>
+                <div class="card-content g-flex-table">
+                    <div class="g-flex-table-row">
+                        <div class="g-flex-table-cell label">[[localize('class')]]</div>
+                        <div class="g-flex-table-cell">[[plc.className]]</div>
+                    </div>
+                    <div class="g-flex-table-row">
+                        <div class="g-flex-table-cell label">
+                            <template is="dom-if" if="[[isPlcError(plc)]]">
+                                <iron-icon class="error-icon" icon="warning"></iron-icon>
+                            </template>
+                            <template is="dom-if" if="[[!isPlcError(plc)]]">
+                                <iron-icon icon="info-outline"></iron-icon>
+                            </template>
+                        </div>
+                        <template is="dom-if" if="[[isPlcError(plc)]]">
+                            <div class="g-flex-table-cell">[[plc.stateMsg]]</div>
+                        </template>
+                        <template is="dom-if" if="[[!isPlcError(plc)]]">
+                            <div class="g-flex-table-cell">[[localize(plc.state)]]</div>
+                        </template>
+                    </div>
+
+                </div>
+                <div class="card-actions">
+                    <dfiv class="card-actions-right">
+                        <paper-button on-tap="startPlc" raised>[[localize('start')]]
+                        </paper-button>
+                        <paper-button on-tap="stopPlc" raised>[[localize('stop')]]
+                        </paper-button>
+                        <paper-button on-tap="reconfigurePlc" raised>[[localize('reconfigure')]]
+                        </paper-button>
+                    </dfiv>
+                </div>
+            </paper-card>
+
+            <template is="dom-repeat" items="[[connections]]" as="connection">
+
+                <paper-card class="item" elevation="1">
+                    <div class="header"><h3>[[connection.id]] / [[connection.name]]</h3></div>
+                    <div class="card-content g-flex-table">
+                        <div class="g-flex-table-row">
+                            <div class="g-flex-table-cell label">[[localize('id')]]</div>
+                            <div class="g-flex-table-cell">[[connection.id]]</div>
+                        </div>
+                        <div class="g-flex-table-row">
+                            <div class="g-flex-table-cell label">[[localize('name')]]</div>
+                            <div class="g-flex-table-cell">[[connection.name]]</div>
+                        </div>
+                        <div class="g-flex-table-row">
+                            <div class="g-flex-table-cell label">[[localize('class')]]</div>
+                            <div class="g-flex-table-cell">[[connection.className]]</div>
+                        </div>
+                        <div class="g-flex-table-row">
+                            <div class="g-flex-table-cell label">
+                                <template is="dom-if" if="[[isError(connection)]]">
+                                    <iron-icon class="error-icon" icon="warning"></iron-icon>
+                                </template>
+                                <template is="dom-if" if="[[!isError(connection)]]">
+                                    <iron-icon icon="info-outline"></iron-icon>
+                                </template>
+                            </div>
+                            <template is="dom-if" if="[[isError(connection)]]">
+                                <div class="g-flex-table-cell">[[connection.stateMsg]]</div>
+                            </template>
+                            <template is="dom-if" if="[[!isError(connection)]]">
+                                <div class="g-flex-table-cell">[[localize(connection.state)]]</div>
+                            </template>
+                        </div>
+
+                        <template is="dom-repeat" items="[[connection.parameters]]" as="param">
+                            <div class="g-flex-table-row">
+                                <div class="g-flex-table-cell label">[[param.id]]</div>
+                                <div class="g-flex-table-cell">[[param.value]]</div>
+                            </div>
+                        </template>
+
+                    </div>
+                    <div class="card-actions">
+                        <dfiv class="card-actions-right">
+                            <paper-button on-tap="connect" raised>[[localize('connect')]]
+                            </paper-button>
+                            <paper-button on-tap="disconnect" raised>[[localize('disconnect')]]
+                            </paper-button>
+                        </dfiv>
+                    </div>
+                </paper-card>
+
+            </template>
+        </div>
+
+        <iron-ajax id="ajaxGetPlc"
+                   url="[[baseRestPath]]/plc/state"
+                   content-type="application/json"
+                   handle-as="json"
+                   method="GET"
+                   on-response="onGetPlcResponse"
+                   on-error="onRequestError"></iron-ajax>
+
+        <iron-ajax id="ajaxGetConnections"
+                   url="[[baseRestPath]]/plc/connections"
+                   content-type="application/json"
+                   handle-as="json"
+                   method="GET"
+                   on-response="onGetConnectionsResponse"
+                   on-error="onRequestError"></iron-ajax>
+
+        <iron-ajax id="ajaxPutPlcState"
+                   content-type="application/json"
+                   handle-as="json"
+                   method="PUT"
+                   on-response="_refresh"
+                   on-error="onAjaxError"></iron-ajax>
+        <iron-ajax id="ajaxPutConnectionState"
+                   content-type="application/json"
+                   handle-as="json"
+                   method="PUT"
+                   on-response="_refresh"
+                   on-error="onAjaxError"></iron-ajax>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'strolch-wc-plc-connections',
+
+            behaviors: [
+                StrolchLocalizeBehavior, StrolchPlcBehavior
+            ],
+
+            properties: {
+                plc: {
+                    type: Object
+                },
+                connections: {
+                    type: Array,
+                    value: []
+                }
+            },
+
+            onGetConnectionsResponse: function (e) {
+                this.connections = e.detail.response.data;
+            },
+            onGetPlcResponse: function (e) {
+                this.plc = e.detail.response.data;
+            },
+
+            isError: function (connection) {
+                return connection != null && connection.state === "Failed";
+            },
+
+            connect: function (e) {
+                this.sendSwitchState(e.model.connection.id, "Connected");
+            },
+            disconnect: function (e) {
+                this.sendSwitchState(e.model.connection.id, "Disconnected");
+            },
+            sendSwitchState: function (connectionId, state) {
+                this.$.ajaxPutConnectionState.url = this.baseRestPath + "/plc/connections/" + connectionId + "/state/" + state;
+                this.$.ajaxPutConnectionState.body = null;
+                this.$.ajaxPutConnectionState.generateRequest();
+            },
+
+            startPlc: function (e) {
+                this.sendPlcState("Started");
+            },
+            stopPlc: function (e) {
+                this.sendPlcState("Stopped");
+            },
+            reconfigurePlc: function (e) {
+                this.sendPlcState("Configured");
+            },
+            sendPlcState: function (state) {
+                this.$.ajaxPutPlcState.url = this.baseRestPath + "/plc/state/" + state;
+                this.$.ajaxPutPlcState.body = null;
+                this.$.ajaxPutPlcState.generateRequest();
+            },
+
+            reload: function (e) {
+                this._refresh();
+            },
+            _refresh: function (e) {
+                this.$.ajaxGetPlc.generateRequest();
+                this.$.ajaxGetConnections.generateRequest();
+            },
+            onAjaxError: function (e) {
+                this._refresh();
+                this.onRequestError(e);
+            },
+        });
+    </script>
+</dom-module>
