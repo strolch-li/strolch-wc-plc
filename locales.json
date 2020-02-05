@@ -30,9 +30,15 @@
     "stop": "Stoppen",
     "reconfigure": "Neu Konfigurieren",
     "info": "Info",
-    "reconnect": "Wiederhestellen"
+    "reconnect": "Wiederhestellen",
+    "lastUpdate": "Letzte Aktualisierung",
+    "confirmActionWarning": "Aktionswarnung",
+    "confirmActionWarningMsg": "Beim Auslösen von Befehlen können Aktoren eingeschaltet werden. Wollen Sie diese Aktion wirklich ausführen?"
   },
   "en": {
+    "confirmActionWarning": "Action Warning",
+    "confirmActionWarningMsg": "Sending commands can turn on actuators. Do you really want to execute this action?",
+    "lastUpdate": "Last Update",
     "info": "Info",
     "start": "Start",
     "stop": "Stop",

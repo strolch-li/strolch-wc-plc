@@ -33,7 +33,7 @@
         </style>
 
         <paper-card elevation="1">
-            <div class="header"><h3>[[device.name]]</h3></div>
+            <div class="header"><h3>[[device.description]]</h3></div>
             <div class="card-content">
 
                 <div class="g-row">
@@ -42,8 +42,10 @@
                         <template is="dom-repeat" items="[[addresses]]" as="address">
                             <div class="g-flex-table-row">
                                 <div class="g-flex-table-cell address-field" title="[[address.id]]">
-                                    <div class="address">[[address.resource]] - [[address.action]]</div>
-                                    <div class="hw-address">[[address.address]]</div>
+                                    <div class="address">[[address.description]]</div>
+                                    <div class="hw-address">&nbsp;&nbsp;&nbsp;[[address.resource]] - [[address.action]]
+                                    </div>
+                                    <div class="hw-address">&nbsp;&nbsp;&nbsp;[[address.address]]</div>
                                 </div>
                                 <div class="g-flex-table-cell address-field no-grow">
                                     <template is="dom-if" if="[[isBoolean(address.valueType)]]">
@@ -251,6 +253,13 @@
             },
 
             sendAddress: function (type, resource, action, value) {
+                this.confirmActionWarning(function () {
+                    this._sendAddress(type, resource, action, value);
+                });
+            },
+
+            _sendAddress: function (type, resource, action, value) {
+
                 console.log("Sending " + type + " for " + resource + " - " + action + ": " + value);
                 this.$.ajaxPutAddress.body = {
                     type: type,

@@ -7,6 +7,10 @@
             localesPath: {
                 type: String,
                 value: './locales.json'
+            },
+            warningConfirmed: {
+                type: Boolean,
+                value: false
             }
         },
 
@@ -77,7 +81,29 @@
 
         onRequestError: function (e) {
             this.fire("strolch-ajax-request-error", e.detail);
-        }
+        },
 
+        confirmActionWarning: function (callback) {
+            var bound = callback.bind(this);
+
+            if (this.warningConfirmed) {
+                bound();
+                return;
+            }
+
+            var confirmedCallback = function (confirmed) {
+                if (confirmed) {
+                    this.warningConfirmed = true;
+                    bound();
+                }
+            }.bind(this);
+
+            this.fire("cx-show-confirmation", {
+                title: this.localize('confirmActionWarning'),
+                text: this.localize('confirmActionWarningMsg'),
+                callback: confirmedCallback,
+                bind: this
+            });
+        }
     }
 </script>

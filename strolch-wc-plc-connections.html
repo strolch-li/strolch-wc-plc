@@ -28,7 +28,7 @@
 
         <style is="custom-style" include="strolch-wc-plc-style">
             .label {
-                min-width: 250px;
+                min-width: 300px;
                 margin-right: 10px;
             }
         </style>
@@ -111,7 +111,7 @@
 
                         <template is="dom-repeat" items="[[connection.parameters]]" as="param">
                             <div class="g-flex-table-row">
-                                <div class="g-flex-table-cell label">[[param.id]]</div>
+                                <div class="g-flex-table-cell label" title="[[param.id]]">[[param.name]]</div>
                                 <div class="g-flex-table-cell">[[param.value]]</div>
                             </div>
                         </template>

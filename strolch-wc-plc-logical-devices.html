@@ -31,61 +31,20 @@
     <template>
 
         <style is="custom-style" include="strolch-wc-plc-style">
+            h2 {
+                margin-bottom: 10px;
+            }
 
+            .actions {
+                padding: 0;
+                margin: 0;
+            }
         </style>
 
         <div class="actions">
+            <p>[[localize('lastUpdate')]]: [[lastUpdate]]</p>
             <paper-icon-button class="g-pull-right" icon="refresh" on-tap="_refresh"></paper-icon-button>
         </div>
-
-        <template is="dom-if" if="[[arrayFilled(virtualAddresses)]]">
-            <h2>[[localize('virtualAddresses')]]</h2>
-            <paper-card elevation="1">
-                <div class="card-content">
-
-                    <div class="g-row">
-                        <div class="g-12">
-
-                            <template is="dom-repeat" items="[[virtualAddresses]]" as="address">
-                                <div class="g-flex-table-row">
-                                    <div class="g-flex-table-cell address-field">
-                                        <div class="address">[[address.resource]] - [[address.action]]</div>
-                                        <div class="hw-address">[[address.address]]</div>
-                                    </div>
-                                    <div class="g-flex-table-cell no-grow value-cell">
-
-                                        <template is="dom-if" if="[[isBoolean(address.type)]]">
-                                            <paper-radio-group selected="{{address.value}}" attr-for-selected="name">
-                                                <paper-radio-button name="true">[[localize('on')]]
-                                                </paper-radio-button>
-                                                <paper-radio-button name="false">[[localize('off')]]
-                                                </paper-radio-button>
-                                            </paper-radio-group>
-                                        </template>
-                                        <template is="dom-if" if="[[isNumber(address.type)]]">
-                                            <paper-input class="value-input"
-                                                         value="{{address.value}}"
-                                                         no-label-float></paper-input>
-                                        </template>
-                                        <template is="dom-if" if="[[isString(address.type)]]">
-                                            <paper-input class="value-input"
-                                                         value="{{address.value}}"
-                                                         no-label-float></paper-input>
-                                        </template>
-
-                                    </div>
-                                    <div class="g-flex-table-cell no-grow">
-                                        <paper-button raised on-tap="sendAddressNotification">[[localize('notify')]]
-                                        </paper-button>
-                                    </div>
-                                </div>
-                            </template>
-
-                        </div>
-                    </div>
-                </div>
-            </paper-card>
-        </template>
 
         <template is="dom-repeat" items="[[devicesByGroup]]" as="group">
 
@@ -108,22 +67,6 @@
                    on-response="onGetDevicesResponse"
                    on-error="onRequestError"></iron-ajax>
 
-        <iron-ajax id="ajaxGetVirtualAddresses"
-                   url="[[baseRestPath]]/plc/addresses/virtual"
-                   content-type="application/json"
-                   handle-as="json"
-                   method="GET"
-                   on-response="onGetVirtualAddressesResponse"
-                   on-error="onRequestError"></iron-ajax>
-
-        <iron-ajax id="ajaxPutAddress"
-                   url="[[baseRestPath]]/plc/addresses"
-                   content-type="application/json"
-                   handle-as="json"
-                   method="PUT"
-                   on-response="_refresh"
-                   on-error="onAjaxError"></iron-ajax>
-
         <strolch-wc-ws-observer id="observerHandler" ws-path="[[wsObserverPath]]"></strolch-wc-ws-observer>
 
     </template>
@@ -137,6 +80,12 @@
             ],
 
             properties: {
+                lastUpdate: {
+                    type: String,
+                    value: function () {
+                        return Strolch.toLocalDateTime(new Date());
+                    }
+                },
                 observerHandler: {
                     type: Object,
                     value: function () {
@@ -146,10 +95,6 @@
                 registeredForUpdates: {
                     type: Boolean,
                     value: false
-                },
-                virtualAddresses: {
-                    type: Array,
-                    value: []
                 },
                 devicesByGroup: {
                     type: Array,
@@ -166,38 +111,16 @@
             /* Listeners */
             onGetDevicesResponse: function (e) {
                 this.devicesByGroup = e.detail.response.data;
-            },
-            onGetVirtualAddressesResponse: function (e) {
-                this.virtualAddresses = e.detail.response.data;
-            },
-
-            sendAddressNotification: function (e) {
-                var a = e.model.address;
-                this.sendAddress("Notification", a.resource, a.action, a.value);
-            },
-            sendAddress: function (type, resource, action, value) {
-                console.log("Sending " + type + " for " + resource + " - " + action + ": " + value);
-                this.$.ajaxPutAddress.body = {
-                    type: type,
-                    resource: resource,
-                    action: action,
-                    value: value
-                };
-                this.$.ajaxPutAddress.generateRequest();
+                this.lastUpdate = Strolch.toLocalDateTime(new Date());
             },
 
             _refresh: function () {
                 this.$.ajaxGetDevices.generateRequest();
-                this.$.ajaxGetVirtualAddresses.generateRequest();
 
                 if (!this.registeredForUpdates) {
                     this.$.observerHandler.register("Resource", "PlcAddress", "strolch-wc-plc-logical-devices", true, this.handleUpdate.bind(this));
                     this.registeredForUpdates = true;
                 }
-            },
-            onAjaxError: function (e) {
-                this._refresh();
-                this.onRequestError(e);
             },
 
             /* Lifecycle */
@@ -210,6 +133,8 @@
                 for (var i = 0; i < elements.length; i++) {
                     this.observerHandler.notifyUpdate(objectType, type, elements[i].id, elements[i]);
                 }
+
+                this.lastUpdate = Strolch.toLocalDateTime(new Date());
             }
         });
 
