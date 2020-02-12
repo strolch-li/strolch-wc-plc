@@ -67,7 +67,7 @@
                    on-response="onGetDevicesResponse"
                    on-error="onRequestError"></iron-ajax>
 
-        <strolch-wc-ws-observer id="observerHandler" ws-path="[[wsObserverPath]]"></strolch-wc-ws-observer>
+        <strolch-wc-ws-observer id="observerHandler" ws-path="[[baseWsPath]]/plc/observer"></strolch-wc-ws-observer>
 
     </template>
 
@@ -99,12 +99,6 @@
                 devicesByGroup: {
                     type: Array,
                     value: []
-                },
-                wsObserverPath: {
-                    type: String,
-                    value: function () {
-                        return CustomWeb.baseWsPath + "/plc/observer";
-                    }
                 }
             },
 
@@ -118,7 +112,7 @@
                 this.$.ajaxGetDevices.generateRequest();
 
                 if (!this.registeredForUpdates) {
-                    this.$.observerHandler.register("Resource", "PlcAddress", "strolch-wc-plc-logical-devices", true, this.handleUpdate.bind(this));
+                    this.$.observerHandler.register("Resource", "PlcAddress", "strolch-wc-plc-logical-devices", {flat: true}, this.handleUpdate.bind(this));
                     this.registeredForUpdates = true;
                 }
             },
