@@ -1,7 +1,7 @@
 {
   "name": "strolch-wc-plc",
   "description": "Strolch PLC WebComponents",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "authors": ["Robert von Burg"],
   "keywords": [
     "strolch",
@@ -21,7 +21,7 @@
     "strolch-wc-styles": "4treesCH/strolch-wc-styles#^0.3.0",
     "strolch-wc-debounced-input": "4treesCH/strolch-wc-debounced-input#^0.1.0",
     "strolch-wc-tree": "4treesCH/strolch-wc-tree#^0.1.6",
-    "strolch-wc-ws-observer": "4treesCH/strolch-wc-ws-observer#^0.2.1",
+    "strolch-wc-ws-observer": "4treesCH/strolch-wc-ws-observer#^0.2.2",
     "strolch-wc-localize-behavior": "4treesCH/strolch-wc-localize-behavior#^1.1.5",
 
     "polymer": "Polymer/polymer#^1.11.3",
