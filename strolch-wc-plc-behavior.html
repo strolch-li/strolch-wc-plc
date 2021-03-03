@@ -85,24 +85,18 @@
 
         confirmActionWarning: function (callback) {
             var bound = callback.bind(this);
-
             if (this.warningConfirmed) {
                 bound();
                 return;
             }
 
-            var confirmedCallback = function (confirmed) {
-                if (confirmed) {
+            this.fire("cx-show-info", {
+                title: this.localize('confirmActionWarning'),
+                line1: this.localize('confirmActionWarningMsg'),
+                callback: function () {
                     this.warningConfirmed = true;
                     bound();
-                }
-            }.bind(this);
-
-            this.fire("cx-show-confirmation", {
-                title: this.localize('confirmActionWarning'),
-                text: this.localize('confirmActionWarningMsg'),
-                callback: confirmedCallback,
-                bind: this
+                }.bind(this)
             });
         }
     }
