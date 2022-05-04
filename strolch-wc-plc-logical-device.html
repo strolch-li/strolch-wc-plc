@@ -50,11 +50,11 @@
                                 <div class="g-flex-table-cell address-field no-grow">
                                     <template is="dom-if" if="[[isBoolean(address.valueType)]]">
                                         <template is="dom-if" if="[[address.value]]">
-                                            <iron-icon style="color:#0b8043"
+                                            <iron-icon class="active-icon"
                                                        icon="icons:radio-button-checked"></iron-icon>
                                         </template>
                                         <template is="dom-if" if="[[!address.value]]">
-                                            <iron-icon style="color:cornflowerblue"
+                                            <iron-icon class="inactive-icon"
                                                        icon="icons:radio-button-unchecked"></iron-icon>
                                         </template>
                                     </template>

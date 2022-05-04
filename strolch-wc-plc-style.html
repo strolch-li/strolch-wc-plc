@@ -1,11 +1,11 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-styles/color.html">
 
-<link rel="import" href="../strolch-wc-styles/strolch-wc-styles.html">
+<link rel="import" href="../strolch-wc-styles/strolch-wc-app-style.html">
 
 <dom-module id="strolch-wc-plc-style">
     <template>
-        <style is="strolch-wc-plc-style" include="strolch-wc-styles">
+        <style is="strolch-wc-plc-style" include="strolch-wc-app-style">
             :host {
                 display: block;
             }
@@ -22,6 +22,13 @@
 
             paper-toggle-button {
                 height: 35px;
+            }
+
+            .active-icon {
+                color: var(--app-primary-color);
+            }
+            .inactive-icon {
+                color: var(--secondary-text-color);
             }
 
             h2, h3 {
