@@ -1,19 +1,22 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../paper-styles/color.html">
+<link rel="import" href="../paper-styles/paper-styles.html">
 
 <link rel="import" href="../strolch-wc-styles/strolch-wc-app-style.html">
 
 <dom-module id="strolch-wc-plc-style">
     <template>
         <style is="strolch-wc-plc-style" include="strolch-wc-app-style">
-            :host {
-                display: block;
+            :root {
+                --app-primary-color: #9965F4;
+                --app-secondary-color: #616161;
+                --primary-text-color: #212121;
+                --secondary-text-color: #737373;
             }
 
             paper-card {
-                margin-bottom: 10px;
+                display: block;
                 padding: 10px;
-                width: calc(100% - 20px);
             }
 
             paper-icon-button, iron-icon {
@@ -22,11 +25,19 @@
 
             paper-toggle-button {
                 height: 35px;
+                margin-left: 10px;
+                margin-right: 5px;
+                --paper-toggle-button-checked-button-color: var(--app-primary-color);
+            }
+
+            paper-radio-button {
+                --paper-radio-button-checked-color: var(--app-primary-color);
             }
 
             .active-icon {
                 color: var(--app-primary-color);
             }
+
             .inactive-icon {
                 color: var(--secondary-text-color);
             }

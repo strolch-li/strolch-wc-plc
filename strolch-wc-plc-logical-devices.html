@@ -31,8 +31,14 @@
     <template>
 
         <style is="custom-style" include="strolch-wc-plc-style">
-            h2 {
-                margin-bottom: 10px;
+            :host {
+                display: block;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            h2:not(:first-of-type) {
+                margin-top: 20px;
             }
 
             .actions {
