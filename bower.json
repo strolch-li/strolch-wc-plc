@@ -1,7 +1,7 @@
 {
   "name": "strolch-wc-plc",
   "description": "Strolch PLC WebComponents",
-  "version": "0.3.17",
+  "version": "0.3.18",
   "authors": ["Robert von Burg"],
   "keywords": [
     "strolch",
@@ -19,8 +19,8 @@
   "dependencies": {
     "strolchjs": "strolch-li/strolchjs#^0.5.1",
     "strolch-wc-styles": "strolch-li/strolch-wc-styles#^0.4.4",
-    "strolch-wc-debounced-input": "strolch-li/strolch-wc-debounced-input#^0.1.2",
-    "strolch-wc-ws-observer": "strolch-li/strolch-wc-ws-observer#^0.2.9",
+    "strolch-wc-debounced-input": "strolch-li/strolch-wc-debounced-input#^0.1.4",
+    "strolch-wc-ws-observer": "strolch-li/strolch-wc-ws-observer#^0.2.10",
     "strolch-wc-localize-behavior": "strolch-li/strolch-wc-localize-behavior#^1.1.14",
 
     "polymer": "Polymer/polymer#^1.12.0",
